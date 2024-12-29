@@ -1,12 +1,84 @@
 <?php
     include('inc/config.php');
     $student_id = $_GET['id'];
-    $class_teacher = "Tr. Racheal";
     // Get the student details according to the id provided
-    $student_query = "SELECT * FROM students where class = 'year4' AND id = $student_id ";
+    // Get student details from the three tables
+    $student_query = " SELECT 
+                stud.first_name AS first_name, 
+                stud.last_name AS last_name,
+                stud.other_name AS other_name,
+                stud.image AS image,
+                stud.club AS club, 
+                stud.gender AS gender,
+                stud.class_teacher AS class_teacher,
+                c.class_name AS class_name,
+                subj.subject_name AS subject_name,
+                m.mark AS mark,
+                m.academic_period AS academic_period
+            FROM
+                students stud
+            JOIN
+                marks m ON m.student_id = stud.student_id
+            JOIN
+                classes c ON c.class_id = stud.class_id
+            JOIN
+                subjects subj ON subj.subject_id = m.subject_id
+            WHERE 
+                stud.student_id = $student_id
+    ";
+
     $student_query_run = mysqli_query($conn, $student_query);
     $student = mysqli_fetch_array($student_query_run);
 
+
+    // Get student marks
+    $marks_query = "SELECT
+            stud.student_id AS student_id,
+            m.mark AS mark,
+            s.subject_name AS subject_name
+        FROM
+            marks m
+        JOIN
+            subjects s ON s.subject_id = m.subject_id
+        JOIN
+            students stud ON stud.student_id = m.student_id
+        WHERE
+            stud.student_id = $student_id
+    ";
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Marks For the table~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    $marks_query_run = mysqli_query($conn, $marks_query);
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Marks for the JS (Charts) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /**
+     * In this case, the data will be retrieved and then converted into a Json format that javascript can utilize
+     */
+
+    //  @@@@@@@@@@@@@@@@@@@@@@@ Get marks into an array @@@@@@@@@@@@@
+    $marks_query = $conn->prepare("SELECT marks.mark FROM marks WHERE student_id = $student_id");
+    $marks_query->bind_result($marks);
+    $marks_query->execute();
+
+    // Loop and add the marks into the marks array
+    $marks_array = array();
+    while($marks_query->fetch()){
+        $marks_array[] = $marks;
+    }
+    // Convert php array into Json format for JS to use it
+    $json_marks_array = json_encode($marks_array);
+
+    //  @@@@@@@@@@@@@@@@@@@@@@@ Get marks into an array @@@@@@@@@@@@@
+    $subjects_query = $conn->prepare("SELECT s.subject_name AS subject_name FROM subjects s JOIN marks m ON m.subject_id = s.subject_id WHERE student_id = $student_id");
+    $subjects_query->bind_result($subjects);
+    $subjects_query->execute();
+
+    // Loop and add all the subjects into the subjects array
+    $subjects_array = array();
+    while($subjects_query->fetch()){
+        $subjects_array[] = $subjects;
+    }
+
+    // Convert php array into Json format for JS to use it
+    $json_subjects_array = json_encode($subjects_array);
 
 
 ?>
@@ -46,6 +118,7 @@
 
 <body>
 
+
     <?php include('inc/header.php'); ?>
     <?php include('inc/sidebar.php'); ?>
 
@@ -78,7 +151,7 @@
                     <p class="text-center fs-4 fw-bolder">
                         <span><?=ucfirst($student['first_name']);?> <?=ucfirst($student['other_name']);?> <?=ucfirst($student['last_name']);?></span>
                         <br>
-                        <span class="fw-bold text-secondary"><?=ucfirst($student['class']);?></span>
+                        <span class="fw-bold text-secondary"><?=ucfirst($student['class_name']);?></span>
                     </p>
 
                     <div class="ps-4">
@@ -100,20 +173,13 @@
                       new Chart(document.querySelector('#barChart'), {
                         type: 'bar',
                         data: {
-                          labels: ['English', 'ICT', 'Math', 'Chemistry', 'History', 'Biology', 'Physics', 'GP'],
+                          labels: <?=$json_subjects_array;?>,
                           datasets: [{
                             barThickness: 20,
                             minBarLength: 2,
-                            data: [
-                                <?=$student['english'];?>, 
-                                <?=$student['ICT'];?>,
-                                <?=$student['mathematics'];?>,
-                                <?=$student['chemistry'];?>,
-                                <?=$student['history'];?>,
-                                <?=$student['biology'];?>,
-                                <?=$student['physics'];?>,
-                                <?=$student['gp'];?>
-                            ],
+                            
+                            data: <?=$json_marks_array;?>,
+
                             backgroundColor: [
                               'rgba(255, 99, 132, 0.7)',
                               'rgba(255, 159, 64, 0.7)',
@@ -239,61 +305,15 @@
                     </thead>
                     <tbody>
 
-                        <tr>
-                            <td class="">English</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['english'];?></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>ICT</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['ICT'];?></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>Mathematics</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['mathematics'];?></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>chemistry</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['chemistry'];?></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>History</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['history'];?></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>Biology</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['biology'];?></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>Physics</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['physics'];?></span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>GP</td>
-                            <td class="text-end">
-                                <span class="me-4 fw-bolder"><?= $student['gp'];?></span>
-                            </td>
-                        </tr>
+                        <?php while($stud_mark = mysqli_fetch_assoc($marks_query_run)){?>
+                            <tr>
+                                <td class=""><?= $stud_mark['subject_name'];?></td>
+                                <td class="text-end">
+                                    <span class="me-4 fw-bolder"><?= $stud_mark['mark'];?></span>
+                                </td>
+                            </tr>
+                        <?php }?>
+                        
                     </tbody>
                 </table>
             </div>

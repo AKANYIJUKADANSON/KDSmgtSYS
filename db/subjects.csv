@@ -1,29 +1,28 @@
-"id","name"
-"1","Mathematics"
-"2","PE"
-"3","French"
-"4","CRE"
-"5","Islamiyat"
-"6","Science"
-"7","GP"
-"8","English"
-"9","ICT"
-"10","Arabic"
-"11","Geography"
-"12","Swahili"
-"13","Chemistry"
-"14","Biology"
-"15","Physics"
-"16","History"
-"17","Fine Art"
-"18","Literature"
-"19","CS"
-"20","Additional Math"
-"21","Sociology"
-"22","Business"
-"23","Economics"
-"24","Psychology"
-"25","Reading"
-"26","	Handwriting"
-"27","	Art & Craft"
-"28","name"
+subject_id,subject_name
+S_Maths,Mathematics
+S_Pe,PE
+S_French,French
+S_CRE,CRE
+S_Islam,Islamiyat
+S_Scie,Science
+S_GP,GP
+S_Eng,English
+S_ICT,ICT
+S_Arab,Arabic
+S_Geog,Geography
+S_Swa,Swahili
+S_Chem,Chemistry
+S_Bio,Biology
+S_Phy,Physics
+S_Hist,History
+S_FA,Fine Art
+S_Lit,Literature
+S_CS,Computer Science
+S_Addit,Additional Math
+S_Socio,Sociology
+S_Bus,Business
+S_Econ,Economics
+S_Psych,Psychology
+S_Read,Reading
+S_Hndwr,Handwriting
+S_A&C,Art & Craft

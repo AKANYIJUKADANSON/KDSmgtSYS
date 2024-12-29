@@ -1,7 +1,7 @@
 <?php
 
     include('inc/config.php');
-    $student_query = "SELECT * FROM students where class = 'year4' ";
+    $student_query = "SELECT * FROM students where class_id = '4' ";
     $student_query_run = mysqli_query($conn, $student_query);
 ?>
 
@@ -84,12 +84,12 @@
                           <span class="fs-6 mt-4"><?= ucfirst($student['gender']);?></span>
                         </td>
                         <td>
-                          <span class="fs-6 mt-4"><?= ucfirst($student['class']);?></span>
+                          <span class="fs-6 mt-4"><?= ucfirst($student['class_id']);?></span>
                         </td>
 
                         <!-- Action Section -->
                          <td>
-                          <a href="dets.php?id=<?=$student['id'];?>"><i class="bi bi-eye-fill text-danger fs-4"></i></a>
+                          <a href="dets.php?id=<?=$student['student_id'];?>"><i class="bi bi-eye-fill text-danger fs-4"></i></a>
                          </td>
                     </tr>
                     <?php } ?>
